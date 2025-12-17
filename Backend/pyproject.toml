@@ -1,0 +1,20 @@
+[project]
+name = "project-3-implementation-socialmediaavengers"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "copilotkit==0.1.65",
+    "dotenv>=0.9.9",
+    "fastapi>=0.115.14",
+    "psycopg2>=2.9.11",
+    "langchain-core==0.3.76",
+    "langchain==0.3.27",
+    "langchain-openai==0.3.33",
+    "pydantic[dotenv]>=2.12.5",
+    "python-dotenv>=1.2.1",
+    "ruff",
+    "scrapegraphai>=1.65.0",
+    "uvicorn>=0.38.0",
+]

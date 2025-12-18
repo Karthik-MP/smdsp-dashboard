@@ -236,38 +236,38 @@ The platform includes an AI-powered SQL agent that allows natural language queri
 
 ## 📊 Sample Outputs & Visualizations
 
-The platform provides rich visualizations and analytics. Sample outputs are available in the `frontend/outputs/` directory:
+The platform provides rich visualizations and analytics. Sample outputs are available in the `Frontend/outputs/` directory:
 
 ### 4chan Analytics
 - **Board Statistics:** Summary stats including total posts, unique boards, and toxicity scores
-  ![4chan Stats](frontend/outputs/Chan_stats.png)
+  ![4chan Stats](Frontend/outputs/Chan_stats.png)
 
 - **Daily Posts by Boards:** Time-series visualization of daily posting activity across boards
-  ![Daily Posts](frontend/outputs/Daily%20Posts%20Chan%20By%20boards%20and%20date.png)
+  ![Daily Posts](Frontend/outputs/Daily%20Posts%20Chan%20By%20boards%20and%20date.png)
 
 - **Posts by Country:** Geographic distribution of 4chan posts
 
-  ![Posts by Country](frontend/outputs/Posts%20by%20Country%20Chan.png)
+  ![Posts by Country](Frontend/outputs/Posts%20by%20Country%20Chan.png)
 
 ### Reddit Analytics
 - **Subreddit Statistics:** Overview of Reddit activity including posts, subreddits, and engagement
-  ![Reddit Stats](frontend/outputs/reddit_stats.png)
+  ![Reddit Stats](Frontend/outputs/reddit_stats.png)
 
 - **Daily Posts by Subreddits:** Trending analysis of subreddit posting activity
-  ![Daily Posts by Subreddit](frontend/outputs/Daily%20Posts%20By%20Subreddits.png)
+  ![Daily Posts by Subreddit](Frontend/outputs/Daily%20Posts%20By%20Subreddits.png)
 
 - **Top Subscribers:** Most popular subreddits by subscriber count
-  ![Top Subscribers](frontend/outputs/Top%20Subscribers%20by%20Subreddits.png)
+  ![Top Subscribers](Frontend/outputs/Top%20Subscribers%20by%20Subreddits.png)
 
 ### Platform Comparison
 - **Engagement by Post Type:** Compare how different post types perform across platforms
-  ![Engagement by Type](frontend/outputs/Engagement%20by%20Post%20Type.png)
+  ![Engagement by Type](Frontend/outputs/Engagement%20by%20Post%20Type.png)
 
 - **Average Toxicity Comparison:** Toxicity levels across boards and subreddits
-  ![Toxicity Comparison](frontend/outputs/Average%20Toxicity%20Per%20Boards_Subreddit.png)
+  ![Toxicity Comparison](Frontend/outputs/Average%20Toxicity%20Per%20Boards_Subreddit.png)
 
 - **Event-Related Timeline:** Track discussion trends around specific events (e.g., Cloudflare Outage)
-  ![Event Timeline](frontend/outputs/Cloudflare%20Outage%20Discussion%20Trends%20(2025-11-18).png)
+  ![Event Timeline](Frontend/outputs/Cloudflare%20Outage%20Discussion%20Trends%20(2025-11-18).png)
 
 ## 📁 Project Structure
 
@@ -281,7 +281,7 @@ The platform provides rich visualizations and analytics. Sample outputs are avai
 │   │   └── utils/          # Helper utilities
 │   ├── logs/               # Application logs
 │   └── pyproject.toml      # Python dependencies
-├── frontend/
+├── Frontend/
 │   └── src/
 │       └── app/
 │           ├── api/        # API client functions

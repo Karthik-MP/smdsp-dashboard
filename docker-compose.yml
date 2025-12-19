@@ -23,10 +23,8 @@ services:
 
   # FastAPI backend service
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: fastapi-backend
+    image: karthikmp15/smdsp-backend:v1
+    container_name: smdsp-backend
     depends_on:
       db:
         condition: service_healthy
@@ -36,8 +34,10 @@ services:
       - .env
     environment:
       # Override database URLs to use Docker network
-      CHAN_DATABASE_URL: postgresql://postgres:password@db:5432/chan_crawler
-      REDDIT_DATABASE_URL: postgresql://postgres:password@db:5432/reddit_crawler
+      CHAN_DATABASE_URL: postgresql://postgres:<password>@<host_name>:5432/<database_name>
+      REDDIT_DATABASE_URL: postgresql://postgres:<password>@<host_name>:5432/<database_name>
+      OPENAI_API_KEY:
+      LLM_MODEL:
     volumes:
       - ./logs:/app/logs
     healthcheck:
@@ -52,14 +52,14 @@ services:
 
   # Next.js frontend service
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-    container_name: nextjs-frontend
+    image: karthikmp15/smdsp-frontend:v1
+    container_name: smdsp-frontend
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_BACKEND_END_POINT: <Backend_URL>
+      NEXT_PUBLIC_COPILOT_END_POINT: <Backend_URL_Copilot>
+      NEXT_PUBLIC_COPILOT_RUNTIME_URL: <Agent Time url>
       NODE_ENV: production
     depends_on:
       api:

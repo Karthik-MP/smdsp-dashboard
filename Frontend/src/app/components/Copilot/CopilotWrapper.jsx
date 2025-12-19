@@ -27,7 +27,7 @@ const CopilotWrapper = ({ children }) => {
   return (
     <CopilotKit
       runtimeUrl="/api/copilotkit"
-      showDevConsole={true}
+      showDevConsole={false}
       agent="sql_agent"
     >
       <ChatWrapper />

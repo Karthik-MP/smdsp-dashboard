@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: "standalone",
-  // serverExternalPackages: [
-  //   "pino",
-  //   "pino-pretty",
-  //   "thread-stream",
-  //   "sonic-boom",
-  //   // "@copilotkit/runtime",
-  // ],
+  serverExternalPackages: [
+    "pino",
+    "pino-pretty",
+    "thread-stream",
+    "sonic-boom",
+    "@copilotkit/runtime",
+  ],
   redirects: async () => [
     {
       source: "/",

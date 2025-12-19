@@ -8,14 +8,14 @@ import { NextRequest } from "next/server";
 const serviceAdapter = new ExperimentalEmptyAdapter();
 const runtime = new CopilotRuntime({
   agents: {
-    my_agent: new HttpAgent({ url: "http://localhost:8000/" }),
+    sql_agent: new HttpAgent({ url: process.env.NEXT_PUBLIC_COPILOT_END_POINT || "http://localhost:8000/copilotkit" }),
   }
 });
 export const POST = async (req: NextRequest) => {
   const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
     runtime,
     serviceAdapter,
-    endpoint: "/api/copilotkit",
+    endpoint: process.env.NEXT_PUBLIC_COPILOT_RUNTIME_URL || "/api/copilotkit",
   });
   return handleRequest(req);
 };

@@ -158,7 +158,7 @@ export default function ComparisonPage() {
         </div>
 
         {/* Event Related Timeline Chart */}
-        <div className="col-span-3 mt-4">
+        <div className="col-span-4 mt-4">
           {eventLoading ? (
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 flex items-center justify-center min-h-[400px]">
               <PropagateLoader loading={true} color="#465fff" />

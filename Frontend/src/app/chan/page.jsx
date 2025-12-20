@@ -150,10 +150,10 @@ export default function Page() {
       )}
 
       {/* ---------- MAIN GRID ---------- */}
-      <div className="grid grid-cols-4 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {/* ---------- DAILY POSTS ---------- */}
-        <div className="col-span-3">
-          <div className="col-span-2 my-1">
+        <div className="col-span-4 md:col-span-3">
+          <div className="col-span-4 md:col-span-2 my-1">
             {loadingDaily ? (
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 flex items-center justify-center min-h-[300px]">
                 <SyncLoader color="#465fff" size={26} />
@@ -175,36 +175,34 @@ export default function Page() {
               />
             )}
           </div>
-          <div className="col-span-2 my-1">
-            {/* ---------- ENGAGEMENT CHART (FULL WIDTH) ---------- */}
-            <div className="mt-4">
-              {loadingEngagement ? (
-                <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 flex items-center justify-center min-h-[400px]">
-                  <SyncLoader color="#465fff" />
-                </div>
-              ) : (
-                <GroupedBarChart
-                  title="Engagement by Post Type"
-                  data={engagementStats}
-                  onFilterChange={handleEngagementFilters}
-                  filterLabel={boardOptions.map((opt) => opt.label)}
-                  defaultFilter={
-                    boardOptions.find((opt) => opt.value === engagementBoard)
-                      ?.label
-                  }
-                  showDateFilter={true}
-                  showDropdown={true}
-                  startDate={engagementStartDate}
-                  endDate={engagementEndDate}
-                  minDate="2025-11-01"
-                />
-              )}
-            </div>
+
+          <div className="col-span-4 md:col-span-2 my-1 mt-4">
+            {loadingEngagement ? (
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 flex items-center justify-center min-h-[400px]">
+                <SyncLoader color="#465fff" />
+              </div>
+            ) : (
+              <GroupedBarChart
+                title="Engagement by Post Type"
+                data={engagementStats}
+                onFilterChange={handleEngagementFilters}
+                filterLabel={boardOptions.map((opt) => opt.label)}
+                defaultFilter={
+                  boardOptions.find((opt) => opt.value === engagementBoard)
+                    ?.label
+                }
+                showDateFilter={true}
+                showDropdown={true}
+                startDate={engagementStartDate}
+                endDate={engagementEndDate}
+                minDate="2025-11-01"
+              />
+            )}
           </div>
         </div>
 
         {/* ---------- COUNTRY STATS ---------- */}
-        <div className="col-span-1 my-1">
+        <div className="col-span-4 md:col-span-1 my-1">
           {loadingCountry ? (
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 flex items-center justify-center min-h-[400px]">
               <SyncLoader color="#465fff" />

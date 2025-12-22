@@ -3,7 +3,7 @@ name = "smdsp-dashboard"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "copilotkit==0.1.65",
     "dotenv>=0.9.9",
@@ -13,8 +13,14 @@ dependencies = [
     "langchain-openai==0.3.33",
     "pydantic[dotenv]>=2.12.5",
     "python-dotenv>=1.2.1",
-    "ruff",
     "scrapegraphai>=1.65.0",
     "uvicorn>=0.38.0",
     "psycopg2>=2.9.11",
+    "redis>=7.1.0",
+    "fastapi-cache2>=0.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.8",
 ]

@@ -105,6 +105,16 @@ pnpm start        # Start production server
 pnpm lint         # Run ESLint
 ```
 
+## To Enable CopilotChat
+- Add these dependenices
+
+  > "@ag-ui/client": "^0.0.42" \
+  "@copilotkit/react-core": "^1.10.6", \
+  "@copilotkit/react-ui": "^1.10.6", \
+  "@copilotkit/runtime": "^1.10.6",\
+  "openai": "^4.104.0",
+
+- Uncomment CopilotWrapper Component in layout.tsx
 ## 📚 Learn More
 
 - [Next.js Documentation](https://nextjs.org/docs)

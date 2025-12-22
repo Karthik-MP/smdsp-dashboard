@@ -1,5 +1,3 @@
-import os
-from pathlib import Path
 from typing import List, Optional
 
 from app.constants.queries import (
@@ -25,29 +23,25 @@ from app.models.chan import (
     SummaryStats,
 )
 from app.utils.logger import Logger
-from app.utils.plsql import PLSQL
-from dotenv import load_dotenv
+from app.utils.plsql import get_data_db
 from fastapi import APIRouter, HTTPException, Query
+from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/chan", tags=["4chan"])
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-CHAN_DATABASE_URL = os.getenv("CHAN_DATABASE_URL")
 logger = Logger("logs").get_logger()
 
 
 @router.get("/boards", response_model=List[Board])
+@cache(expire=9999999)
 async def get_boards():
     """Get list of all boards"""
     logger.info("GET /boards called")
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
         logger.info("Executing SELECT_ALL_BOARDS query")
-        result = plsql.get_data_from(SELECT_ALL_BOARDS)
+        result = await get_data_db("chan", SELECT_ALL_BOARDS)
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         boards = []
         for row in result:
@@ -67,17 +61,15 @@ async def get_boards():
 
 
 @router.get("/stats/summary", response_model=SummaryStats)
+@cache(expire=9999999)
 async def get_summary_stats():
     logger.info("GET /stats/summary called")
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
         logger.info("Executing SELECT_CHAN_SUMMARY_STATS")
 
-        result = plsql.get_data_from(SELECT_CHAN_SUMMARY_STATS, None)
+        result = await get_data_db("chan", SELECT_CHAN_SUMMARY_STATS, None)
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         if result:
             row = result[0]
@@ -97,6 +89,7 @@ async def get_summary_stats():
 
 
 @router.get("/stats/daily", response_model=List[StatsDaily])
+@cache(expire=9999999)
 async def get_daily_post_stats(
     board_name: Optional[str] = Query(None),
     start_date: Optional[str] = Query("2025-11-15"),
@@ -107,8 +100,6 @@ async def get_daily_post_stats(
     )
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
-
         sql = SELECT_CHAN_DAILY_POST_COUNT
         params = []
 
@@ -132,10 +123,8 @@ async def get_daily_post_stats(
         logger.info(f"Executing daily stats query: {sql}")
         logger.info(f"Query params: {params}")
 
-        result = plsql.get_data_from(sql, tuple(params))
+        result = await get_data_db("chan", sql, tuple(params))
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         return [StatsDaily(day=str(row[0]), count=row[1]) for row in result]
 
@@ -149,8 +138,6 @@ async def debug_posts(board_name: str = Query("pol")):
     logger.info(f"GET /debug/posts called with board_name={board_name}")
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
-
         logger.info("Running debug test query for posts")
 
         test_query = """
@@ -176,10 +163,8 @@ async def debug_posts(board_name: str = Query("pol")):
         params = (board_name, "2025-12-01", "2025-12-05")
         logger.info(f"Query params: {params}")
 
-        result = plsql.get_data_from(test_query, params)
+        result = await get_data_db("chan", test_query, params)
         logger.info(f"Debug returned {len(result)} rows")
-
-        plsql.close_connection()
 
         return {
             "query_results": [
@@ -192,6 +177,7 @@ async def debug_posts(board_name: str = Query("pol")):
 
 
 @router.get("/activity/daily", response_model=DailyActivityResponse)
+@cache(expire=9999999)
 async def get_daily_activity(
     board_name: str,
     start_date: str,
@@ -203,15 +189,12 @@ async def get_daily_activity(
     )
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
         logger.info("Executing SELECT_DAILY_ACTIVITY")
 
-        result = plsql.get_data_from(
-            SELECT_DAILY_ACTIVITY, (board_name, start_date, end_date)
+        result = await get_data_db(
+            "chan", SELECT_DAILY_ACTIVITY, (board_name, start_date, end_date)
         )
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         data = []
         for row in result:
@@ -232,6 +215,7 @@ async def get_daily_activity(
 
 
 @router.get("/activity/hourly", response_model=HourlyActivityResponse)
+@cache(expire=9999999)
 async def get_hourly_activity(
     board_name: str, selected_date: str, post_types: Optional[List[str]] = None
 ):
@@ -240,15 +224,11 @@ async def get_hourly_activity(
     )
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
-
         logger.info("Executing SELECT_HOURLY_ACTIVITY")
-        result = plsql.get_data_from(
-            SELECT_HOURLY_ACTIVITY, (board_name, selected_date)
+        result = await get_data_db(
+            "chan", SELECT_HOURLY_ACTIVITY, (board_name, selected_date)
         )
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         data = []
         for row in result:
@@ -272,6 +252,7 @@ async def get_hourly_activity(
 
 
 @router.get("/engagement/by-type", response_model=EngagementByTypeResponse)
+@cache(expire=9999999)
 async def get_engagement_by_type(board_name: str, start_date: str, end_date: str):
     logger.info(
         f"GET /engagement/by-type called with boards={board_name}, start={start_date}, end={end_date}"
@@ -281,15 +262,14 @@ async def get_engagement_by_type(board_name: str, start_date: str, end_date: str
         board_list = [b.strip() for b in board_name.split(",") if b.strip()]
         logger.info(f"Parsed board list: {board_list}")
 
-        plsql = PLSQL(CHAN_DATABASE_URL)
         logger.info("Executing SELECT_CHAN_ENGAGEMENT_BY_TYPE")
 
-        result = plsql.get_data_from(
-            SELECT_CHAN_ENGAGEMENT_BY_TYPE, (board_list, start_date, end_date)
+        result = await get_data_db(
+            "chan",
+            SELECT_CHAN_ENGAGEMENT_BY_TYPE,
+            (board_list, start_date, end_date),
         )
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         data = []
 
@@ -346,17 +326,15 @@ async def get_engagement_by_type(board_name: str, start_date: str, end_date: str
 
 
 @router.get("/stats/countries", response_model=CountryStatsResponse)
+@cache(expire=9999999)
 async def get_country_stats():
     logger.info("GET /stats/countries called")
 
     try:
-        plsql = PLSQL(CHAN_DATABASE_URL)
         logger.info("Executing SELECT_CHAN_COUNTRY_STATS")
 
-        result = plsql.get_data_from(SELECT_CHAN_COUNTRY_STATS, None)
+        result = await get_data_db("chan", SELECT_CHAN_COUNTRY_STATS, None)
         logger.info(f"Query returned {len(result)} rows")
-
-        plsql.close_connection()
 
         data = []
         for row in result:

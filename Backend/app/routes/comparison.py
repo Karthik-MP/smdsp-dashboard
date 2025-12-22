@@ -1,7 +1,5 @@
 import asyncio
-import os
 from datetime import datetime, date, timedelta
-from pathlib import Path
 from typing import List
 
 from app.constants.queries import (
@@ -20,29 +18,23 @@ from app.constants.reddit_queries import (
 )
 from app.models.chan import PlatformComparisonData, PlatformComparisonResponse
 from app.models.comparison_response import ForumsToxicity
-from app.utils.plsql import PLSQL, get_data_db
-from dotenv import load_dotenv
+from app.utils.plsql import get_data_db
 from fastapi import APIRouter, HTTPException, Query
+from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/comparison", tags=["Platform Comparison"])
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-
-CHAN_DATABASE_URL = os.getenv("CHAN_DATABASE_URL")
-REDDIT_DATABASE_URL = os.getenv("REDDIT_DATABASE_URL")
 
 
-def sync_get_data(database_url, query):
-    plsql = PLSQL(database_url)
-    data = plsql.get_data_from(query)
-    plsql.close_connection()
-    return data
+async def sync_get_data(database_url, query):
+    return await get_data_db(database_url, query)
 
 
 @router.get("/forums")
+@cache(expire=9999999)
 async def get_forums():
     chan_data, reddit_data = await asyncio.gather(
-        asyncio.to_thread(sync_get_data, CHAN_DATABASE_URL, SELECT_BOARD_COUNT),
-        asyncio.to_thread(sync_get_data, REDDIT_DATABASE_URL, SELECT_SUBREDDIT_COUNT),
+        asyncio.to_thread(sync_get_data, "chan", SELECT_BOARD_COUNT),
+        asyncio.to_thread(sync_get_data, "reddit", SELECT_SUBREDDIT_COUNT),
     )
 
     return {
@@ -52,6 +44,7 @@ async def get_forums():
 
 
 @router.get("/engagement/by-type", response_model=PlatformComparisonResponse)
+@cache(expire=9999999)
 async def compare_engagement_by_type(
     board_name: str = Query(..., description="4chan board name (e.g., 'pol')"),
     subreddit: str = Query(..., description="Reddit subreddit name"),
@@ -65,11 +58,11 @@ async def compare_engagement_by_type(
     """
     try:
         # Get 4chan data
-        plsql_chan = PLSQL(CHAN_DATABASE_URL)
-        chan_result = plsql_chan.get_data_from(
-            SELECT_CHAN_ENGAGEMENT_BY_TYPE, (board_name, start_date, end_date)
+        chan_result = await get_data_db(
+            "chan",
+            SELECT_CHAN_ENGAGEMENT_BY_TYPE,
+            (board_name, start_date, end_date),
         )
-        plsql_chan.close_connection()
 
         # Convert dates to Unix timestamps for Reddit query
         start_dt = datetime.strptime(start_date, "%Y-%m-%d")
@@ -78,11 +71,11 @@ async def compare_engagement_by_type(
         end_ts = int(end_dt.timestamp())
 
         # Get Reddit data
-        plsql_reddit = PLSQL(REDDIT_DATABASE_URL)
-        reddit_result = plsql_reddit.get_data_from(
-            SELECT_REDDIT_ENGAGEMENT_BY_TYPE, (subreddit, start_ts, end_ts)
+        reddit_result = await get_data_db(
+            "reddit",
+            SELECT_REDDIT_ENGAGEMENT_BY_TYPE,
+            (subreddit, start_ts, end_ts),
         )
-        plsql_reddit.close_connection()
 
         # Convert results to dictionaries for easy lookup
         chan_data = {
@@ -133,16 +126,15 @@ async def compare_engagement_by_type(
 
 
 @router.get("/top-toxic", response_model=List[ForumsToxicity])
+@cache(expire=9999999)
 async def get_top_toxic_forums():
     """
     Get top toxic forums from both 4chan and Reddit, sorted by average toxicity.
     Combines data from both platforms and returns a unified list.
     """
     try:
-        chan_toxicity = get_data_db(CHAN_DATABASE_URL, SELECT_BOARD_TOXICITY, None)
-        reddit_toxicity = get_data_db(
-            REDDIT_DATABASE_URL, SELECT_SUBREDDIT_TOXICITY, None
-        )
+        chan_toxicity = await get_data_db("chan", SELECT_BOARD_TOXICITY, None)
+        reddit_toxicity = await get_data_db("reddit", SELECT_SUBREDDIT_TOXICITY, None)
 
         final_result = []
 
@@ -275,6 +267,7 @@ CLOUDFLARE_KEYWORDS = [
 
 
 @router.get("/event-related-timeline")
+@cache(expire=9999999)
 async def get_event_related_timeline(
     platform: str, community: str = "", event_date: date = None, window: int = 7
 ):
@@ -302,13 +295,13 @@ async def get_event_related_timeline(
             end_ts,
             patterns,
         )
-        rows = get_data_db(REDDIT_DATABASE_URL, SELECT_REDDIT_EVENT_RELATED, params)
+        rows = await get_data_db("reddit", SELECT_REDDIT_EVENT_RELATED, params)
 
     # 4chan
     elif platform == "chan":
         # Parameters order: start_ts, end_ts (for date_series), then community, start, end, patterns (for subject), patterns (for comment)
         params = (start_ts, end_ts, community, start_ts, end_ts, patterns, patterns)
-        rows = get_data_db(CHAN_DATABASE_URL, SELECT_CHAN_EVENT_RELATED, params)
+        rows = await get_data_db("chan", SELECT_CHAN_EVENT_RELATED, params)
 
     # Both platforms - need to merge results by date
     elif platform == "all" or platform == "":
@@ -323,15 +316,13 @@ async def get_event_related_timeline(
             end_ts,
             patterns,
         )
-        reddit_rows = get_data_db(
-            REDDIT_DATABASE_URL, SELECT_REDDIT_EVENT_RELATED_ALL, reddit_params
+        reddit_rows = await get_data_db(
+            "reddit", SELECT_REDDIT_EVENT_RELATED_ALL, reddit_params
         )
 
         # Get 4chan data (all boards - no community filter)
         chan_params = (start_ts, end_ts, start_ts, end_ts, patterns, patterns)
-        chan_rows = get_data_db(
-            CHAN_DATABASE_URL, SELECT_CHAN_EVENT_RELATED_ALL, chan_params
-        )
+        chan_rows = await get_data_db("chan", SELECT_CHAN_EVENT_RELATED_ALL, chan_params)
 
         # Merge results by date - sum counts for same dates
         date_counts = {}

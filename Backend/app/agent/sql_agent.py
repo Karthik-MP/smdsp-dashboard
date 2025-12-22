@@ -10,6 +10,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from app.agent.DBScheme import DB_SCHEMA
 from langchain_core.runnables import RunnableConfig
+from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
@@ -97,7 +98,7 @@ async def interpret(state: SQLAgentState, config):
 async def execute_sql(state: SQLAgentState, config):
     sql = state["sql"]
     db_used = state["db_used"]
-    messages = state["messages"]
+    # messages = state["messages"]
 
     database_url = REDDIT_DATABASE_URL if db_used == "reddit" else CHAN_DATABASE_URL
 
@@ -137,8 +138,6 @@ graph.add_node("answer", answer)
 graph.set_entry_point("interpret")
 graph.add_edge("execute_sql", "answer")
 graph.add_edge("answer", END)
-
-from langgraph.checkpoint.memory import MemorySaver
 
 memory = MemorySaver()
 sql_agent = graph.compile(checkpointer=memory)

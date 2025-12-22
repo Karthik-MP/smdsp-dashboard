@@ -55,6 +55,53 @@ REDDIT_DATABASE_URL=postgresql://user:password@host:port/reddit_db
 OPENAI_API_KEY=your_openai_api_key
 ```
 
+# Redis Setup (Backend Caching)
+
+This project uses Redis for backend caching via FastAPI Cache. Redis must be running and accessible to the backend service.
+
+## Install Redis (Local)
+
+On Ubuntu/Debian:
+```sh
+sudo apt update
+sudo apt install redis-server
+```
+
+On macOS (with Homebrew):
+```sh
+brew install redis
+```
+
+## Start Redis
+```sh
+redis-server
+```
+
+## Configuration
+
+The backend expects a Redis URL in the environment variable `REDIS_URL` (default: `redis://localhost:6379/0`).
+
+Example (in your environment or .env file):
+```
+REDIS_URL=redis://localhost:6379/0
+```
+
+## Docker Compose
+
+If using Docker Compose, add a Redis service to your `docker-compose.yml`:
+
+```yaml
+services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+```
+
+## Usage
+
+The backend will automatically connect to Redis on startup for caching API responses.
+
 ## 🔧 Installation & Setup
 
 ### Backend Setup

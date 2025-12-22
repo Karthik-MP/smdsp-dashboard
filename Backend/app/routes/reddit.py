@@ -1,6 +1,4 @@
-import os
 from datetime import datetime
-from pathlib import Path
 from typing import List, Optional
 
 from app.constants.reddit_queries import (
@@ -17,21 +15,18 @@ from app.models.reddit import (
     SubScribers,
     SummaryStats,
 )
-from app.utils.plsql import PLSQL
-from dotenv import load_dotenv
+from app.utils.plsql import get_data_db
 from fastapi import APIRouter, HTTPException, Query
+from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/reddit", tags=["Reddit"])
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-
-REDDIT_DATABASE_URL = os.getenv("REDDIT_DATABASE_URL")
 
 
 @router.get("/subreddits")
+@cache(expire=9999999)
 async def get_subreddits():
     """Get list of available subreddits"""
     try:
-        plsql = PLSQL(REDDIT_DATABASE_URL)
         query = """
         SELECT DISTINCT subreddit, COUNT(*) as post_count
         FROM posts
@@ -39,8 +34,7 @@ async def get_subreddits():
         ORDER BY post_count DESC
         LIMIT 20
         """
-        result = plsql.get_data_from(query, ())
-        plsql.close_connection()
+        result = await get_data_db("reddit", query, ())
 
         return {
             "subreddits": [{"name": row[0], "post_count": row[1]} for row in result]
@@ -55,8 +49,6 @@ async def debug_posts(
 ):
     """Debug endpoint to check Reddit posts data"""
     try:
-        plsql = PLSQL(REDDIT_DATABASE_URL)
-
         # First check table structure
         structure_query = """
         SELECT column_name, data_type 
@@ -64,13 +56,13 @@ async def debug_posts(
         WHERE table_name = 'posts'
         ORDER BY ordinal_position
         """
-        structure = plsql.get_data_from(structure_query, ())
+        structure = await get_data_db("reddit", structure_query, ())
 
         # Check all posts
         count_query = """
         SELECT COUNT(*) FROM posts
         """
-        total = plsql.get_data_from(count_query, ())
+        total = await get_data_db("reddit", count_query, ())
 
         # Sample posts
         sample_query = """
@@ -78,9 +70,7 @@ async def debug_posts(
         FROM posts
         LIMIT 10
         """
-        samples = plsql.get_data_from(sample_query, ())
-
-        plsql.close_connection()
+        samples = await get_data_db("reddit", sample_query, ())
 
         return {
             "total_posts_in_db": total[0][0] if total else 0,
@@ -102,6 +92,7 @@ async def debug_posts(
 
 
 @router.get("/engagement/by-type", response_model=EngagementByTypeResponse)
+@cache(expire=9999999)
 async def get_engagement_by_type(
     subreddit: str = Query(..., description="Subreddit name"),
     start_timestamp: int = Query(..., description="Start Unix timestamp"),
@@ -113,12 +104,11 @@ async def get_engagement_by_type(
     This directly answers RQ1 about how different post types affect engagement.
     """
     try:
-        plsql = PLSQL(REDDIT_DATABASE_URL)
-        result = plsql.get_data_from(
+        result = await get_data_db(
+            "reddit",
             SELECT_REDDIT_ENGAGEMENT_BY_TYPE,
             (subreddit, start_timestamp, end_timestamp),
         )
-        plsql.close_connection()
 
         data = []
         for row in result:
@@ -147,17 +137,16 @@ async def get_engagement_by_type(
 
 
 @router.get("/stats/summary", response_model=SummaryStats)
+@cache(expire=9999999)
 async def get_summary_stats():
     """
     Get summary statistics: total posts, unique boards, and total toxicity.
     """
     try:
-        plsql = PLSQL(REDDIT_DATABASE_URL)
-
         # Parameters for the query (board_name, start_date, end_date repeated twice)
 
-        result = plsql.get_data_from(SELECT_REDDIT_SUMMARY_STATS, None)
-        plsql.close_connection()
+        result = await get_data_db("reddit", SELECT_REDDIT_SUMMARY_STATS, None)
+
         # print(result)
         if result and len(result) > 0:
             row = result[0]
@@ -177,6 +166,7 @@ async def get_summary_stats():
 
 
 @router.get("/posts/daily-counts", response_model=DailyPostCountsResponse)
+@cache(expire=9999999)
 async def get_daily_post_counts(
     start_date: Optional[str] = Query(
         "2025-11-01", description="Start date in YYYY-MM-DD format"
@@ -224,9 +214,7 @@ async def get_daily_post_counts(
         # Build final query
         query = SELECT_DAILY_POST_COUNTS_BY_SUBREDDIT.format(date_filter=date_filter)
 
-        plsql = PLSQL(REDDIT_DATABASE_URL)
-        result = plsql.get_data_from(query, tuple(params))
-        plsql.close_connection()
+        result = await get_data_db("reddit", query, tuple(params))
 
         # Group data by date
         date_groups = {}
@@ -255,11 +243,11 @@ async def get_daily_post_counts(
 
 
 @router.get("/subreddit/top-subscribers", response_model=List[SubScribers])
+@cache(expire=9999999)
 async def get_top_subscribers():
     try:
-        plsql = PLSQL(REDDIT_DATABASE_URL)
-        result = plsql.get_data_from(SELECT_NUMBER_OF_SUBSCRIBERS, None)
-        plsql.close_connection()
+        result = await get_data_db("reddit", SELECT_NUMBER_OF_SUBSCRIBERS, None)
+
         if len(result) > 0:
             final_result = []
             for subreddit_name, subscribers in result:

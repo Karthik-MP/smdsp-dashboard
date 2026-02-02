@@ -1,7 +1,5 @@
 # Social Media Analytics Platform
 
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Ne05oVw_)
-
 A comprehensive analytics platform for comparing and analyzing social media engagement patterns across 4chan and Reddit, featuring AI-powered insights using LangChain and CopilotKit.
 
 ## 🚀 Tech Stack
@@ -305,3 +303,4 @@ OPENAI_API_KEY=sk-...
 ## 📝 License
 
 This project is part of an academic assignment.
+

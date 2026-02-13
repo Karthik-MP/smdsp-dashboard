@@ -1,0 +1,161 @@
+{
+  "chan": {
+    "summaryStats": {
+      "total_posts": 150000,
+      "unique_boards": 12,
+      "total_toxicity": 45000
+    },
+    "dailyStats": [
+      { "day": "2025-11-15", "count": 1250 },
+      { "day": "2025-11-16", "count": 1340 },
+      { "day": "2025-11-17", "count": 1180 },
+      { "day": "2025-11-18", "count": 1420 },
+      { "day": "2025-11-19", "count": 1560 },
+      { "day": "2025-11-20", "count": 1490 },
+      { "day": "2025-11-21", "count": 1380 }
+    ],
+    "countryStats": {
+      "data": [
+        { "name": "United States", "count": 45000, "percent": 30.0, "flag": "🇺🇸" },
+        { "name": "United Kingdom", "count": 22500, "percent": 15.0, "flag": "🇬🇧" },
+        { "name": "Canada", "count": 15000, "percent": 10.0, "flag": "🇨🇦" },
+        { "name": "Australia", "count": 12000, "percent": 8.0, "flag": "🇦🇺" },
+        { "name": "Germany", "count": 10500, "percent": 7.0, "flag": "🇩🇪" },
+        { "name": "France", "count": 9000, "percent": 6.0, "flag": "🇫🇷" },
+        { "name": "Netherlands", "count": 7500, "percent": 5.0, "flag": "🇳🇱" },
+        { "name": "Japan", "count": 6000, "percent": 4.0, "flag": "🇯🇵" }
+      ]
+    },
+    "engagementByType": {
+      "platform": "4chan",
+      "community": "pol",
+      "start_date": "2025-11-15",
+      "end_date": "2025-12-15",
+      "data": [
+        {
+          "post_type": "opinion",
+          "total_threads": 5000.0,
+          "avg_replies": 15.5,
+          "total_replies": 77500.0,
+          "avg_images": 2.3,
+          "norm_total_threads": 1.0,
+          "norm_total_replies": 0.9,
+          "norm_avg_replies": 0.85,
+          "norm_avg_images": 0.7
+        },
+        {
+          "post_type": "question",
+          "total_threads": 3500.0,
+          "avg_replies": 12.3,
+          "total_replies": 43050.0,
+          "avg_images": 1.5,
+          "norm_total_threads": 0.7,
+          "norm_total_replies": 0.5,
+          "norm_avg_replies": 0.67,
+          "norm_avg_images": 0.45
+        },
+        {
+          "post_type": "news",
+          "total_threads": 2800.0,
+          "avg_replies": 18.2,
+          "total_replies": 50960.0,
+          "avg_images": 3.1,
+          "norm_total_threads": 0.56,
+          "norm_total_replies": 0.59,
+          "norm_avg_replies": 1.0,
+          "norm_avg_images": 0.95
+        },
+        {
+          "post_type": "meme",
+          "total_threads": 4200.0,
+          "avg_replies": 8.7,
+          "total_replies": 36540.0,
+          "avg_images": 3.8,
+          "norm_total_threads": 0.84,
+          "norm_total_replies": 0.42,
+          "norm_avg_replies": 0.48,
+          "norm_avg_images": 1.0
+        }
+      ]
+    }
+  },
+  "reddit": {
+    "summaryStats": {
+      "total_posts": 250000,
+      "unique_subreddit": 25,
+      "total_toxicity": 35000,
+      "total_comments": 1500000
+    },
+    "dailyPostsCount": {
+      "data": [
+        {
+          "date": "2025-11-01",
+          "subreddit_counts": {
+            "technology": 450,
+            "programming": 320,
+            "politics": 280,
+            "news": 510
+          }
+        },
+        {
+          "date": "2025-11-02",
+          "subreddit_counts": {
+            "technology": 480,
+            "programming": 340,
+            "politics": 295,
+            "news": 530
+          }
+        },
+        {
+          "date": "2025-11-03",
+          "subreddit_counts": {
+            "technology": 420,
+            "programming": 310,
+            "politics": 270,
+            "news": 490
+          }
+        }
+      ]
+    },
+    "topSubscribers": [
+      { "subreddit_name": "Technology", "subscribers": 15000000 },
+      { "subreddit_name": "Programming", "subscribers": 8500000 },
+      { "subreddit_name": "Politics", "subscribers": 12000000 },
+      { "subreddit_name": "News", "subscribers": 20000000 },
+      { "subreddit_name": "Gaming", "subscribers": 18000000 }
+    ]
+  },
+  "comparison": {
+    "toxicity": [
+      { "forum_name": "pol", "average_toxicity": 0.75, "platform": "4chan" },
+      { "forum_name": "b", "average_toxicity": 0.72, "platform": "4chan" },
+      { "forum_name": "politics", "average_toxicity": 0.68, "platform": "reddit" },
+      { "forum_name": "int", "average_toxicity": 0.65, "platform": "4chan" },
+      { "forum_name": "news", "average_toxicity": 0.62, "platform": "reddit" },
+      { "forum_name": "worldnews", "average_toxicity": 0.60, "platform": "reddit" }
+    ],
+    "eventRelatedData": {
+      "platform": "all",
+      "community": "",
+      "event_date": "2025-12-01",
+      "window": 7,
+      "timeline": [
+        { "date": "2025-11-24", "count": 45 },
+        { "date": "2025-11-25", "count": 52 },
+        { "date": "2025-11-26", "count": 48 },
+        { "date": "2025-11-27", "count": 67 },
+        { "date": "2025-11-28", "count": 89 },
+        { "date": "2025-11-29", "count": 156 },
+        { "date": "2025-11-30", "count": 234 },
+        { "date": "2025-12-01", "count": 456 },
+        { "date": "2025-12-02", "count": 312 },
+        { "date": "2025-12-03", "count": 189 },
+        { "date": "2025-12-04", "count": 134 },
+        { "date": "2025-12-05", "count": 98 },
+        { "date": "2025-12-06", "count": 76 },
+        { "date": "2025-12-07", "count": 63 },
+        { "date": "2025-12-08", "count": 54 }
+      ]
+    }
+  }
+}
